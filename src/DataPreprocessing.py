@@ -48,8 +48,16 @@ def fill_in_nan(df, col_list):
     return df
 
 
-def transform_qual_features_to_quan(df):
-    df = df.map({'NA':0, 'Grvl':1, 'Pave':2})
+def transform_qual_features_to_quan(df, textList, numList):
+    # map need be to performed on a column
+    # df = df.Alley.map({'NA':0, 'Grvl':1, 'Pave':2})
+    mapDict = {}
+    for text in textList:
+        index = textList.index(text)
+        num = numList[index]
+        mapDict[text] = num
+
+    df = df.map(mapDict)
 
     return df
 
@@ -101,9 +109,13 @@ def transform_dummy_variables(df, qual_list):
 
 input_file = '../data/input/house_prices/train.csv'
 df, quan_list, qual_list = quan_qual_feature_division(input_file, features_to_drop_list=['Id'])
+textList = ['NA', 'Grvl', 'Pave']
+numList = [0, 1, 2]
+df.Alley = transform_qual_features_to_quan(df.Alley, textList, numList)
+print df.Alley
 # get_nan_cols(df, quan_list, qual_list)
 # df = get_skewness_and_transform(df, quan_list)
-df = pd.get_dummies(df, columns=qual_list)
-print df.columns.values
+# df = pd.get_dummies(df, columns=qual_list)
+# print df.columns.values
 
 # df.Age = df.Age.map(lambda x: 0 if x < 0 else x)
