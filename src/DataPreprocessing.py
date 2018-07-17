@@ -107,12 +107,12 @@ def transform_dummy_variables(df, qual_list):
 
     return df
 
-input_file = '../data/input/house_prices/train.csv'
-df, quan_list, qual_list = quan_qual_feature_division(input_file, features_to_drop_list=['Id'])
-textList = ['NA', 'Grvl', 'Pave']
-numList = [0, 1, 2]
-df.Alley = transform_qual_features_to_quan(df.Alley, textList, numList)
-print df.Alley
+# input_file = '../data/input/house_prices/train.csv'
+# df, quan_list, qual_list = quan_qual_feature_division(input_file, features_to_drop_list=['Id'])
+# textList = ['NA', 'Grvl', 'Pave']
+# numList = [0, 1, 2]
+# df.Alley = transform_qual_features_to_quan(df.Alley, textList, numList)
+# print df.Alley
 # get_nan_cols(df, quan_list, qual_list)
 # df = get_skewness_and_transform(df, quan_list)
 # df = pd.get_dummies(df, columns=qual_list)
