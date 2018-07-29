@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from scipy.stats import skew
+from sklearn.preprocessing import StandardScaler, RobustScaler
 
 
 def quan_qual_feature_division(input_file, features_to_drop_list):
@@ -33,6 +34,14 @@ def get_nan_cols(df, quan_list, qual_list):
     print(hasNAN)
 
 
+def get_missing_data_ration(df):
+    df_na = (df.isnull().sum() / len(df)) * 100.0
+    df_na_top = df_na.drop(df_na[df_na == 0].index).sort_values(ascending=False)[:30]
+    missing_data = pd.DataFrame({'Missing Ratio': df_na_top})
+    # print missing_data.head(20)
+    return missing_data
+
+
 def fill_in_nan(df, col_list):
     for col in col_list:
         # fill in the data with median values - numerical feature
@@ -44,7 +53,6 @@ def fill_in_nan(df, col_list):
         # df[col] = df[col].fillna('None', inplace=True)
         # fill in the data with mode value - categorical feature
         # df[col] = df[col].fillna(df[col].mod()[0], inplace=True)
-
     return df
 
 
@@ -62,24 +70,6 @@ def transform_qual_features_to_quan(df, textList, numList):
     return df
 
 
-def visualize_quan_list_hist(df, quan_list):
-    # visualize the distribution of each numerical feature
-    temp = pd.melt(df, value_vars=quan_list)
-    grid = sns.FacetGrid(temp, col="variable", col_wrap=6, size=3.0,
-                         aspect=0.8, sharex=False, sharey=False)
-    grid.map(sns.distplot, "value")
-    plt.show()
-
-
-def visualize_quan_list_scatter(df, quan_list, y_var, y_label):
-    # scatter plots
-    temp = pd.melt(df, id_vars=[y_var], value_vars=quan_list)
-    grid = sns.FacetGrid(temp, col="variable", col_wrap=4, size=3.0,
-                         aspect=1.2, sharex=False, sharey=False)
-    grid.map(plt.scatter, "value", y_label, s=1.5)
-    plt.show()
-
-
 def get_skewness_and_transform(df, quan_list):
     # print the skewness of each numerical feature
     for i in quan_list:
@@ -89,7 +79,6 @@ def get_skewness_and_transform(df, quan_list):
     skewed_features = np.array(quan_list)[np.abs(skew(df[quan_list])) > 0.5]
     print skewed_features
     df[skewed_features] = np.log1p(df[skewed_features]) # log(1 + x), natural logarithm
-
     return df
 
 
@@ -104,8 +93,21 @@ def transform_dummy_variables(df, qual_list):
     df = pd.get_dummies(df, columns=qual_list)
     # drop the last column generated from each categorical feature
     df = df.drop(dummy_drop, axis=1)
-
     return df
+
+
+def standardize_Xtrain_Xtest(df_Xtrain, df_Xtest, quan_list):
+    # quan_list is the list of quantitative variables
+    # if y is in the df, drop it
+    # X_train = df[:1460].drop(['var1', 'var2'], axis=1)
+    # fit the training set only and then transform both training and test sets
+    scaler = RobustScaler()
+    df_Xtrain[quan_list] = scaler.fit_transform(df_Xtrain[quan_list])
+    df_Xtest[quan_list] = scaler.transform(df_Xtest[quan_list])
+    return df_Xtrain, df_Xtest
+
+
+
 
 # input_file = '../data/input/house_prices/train.csv'
 # df, quan_list, qual_list = quan_qual_feature_division(input_file, features_to_drop_list=['Id'])
