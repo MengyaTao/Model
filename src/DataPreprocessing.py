@@ -96,16 +96,6 @@ def transform_dummy_variables(df, qual_list):
     return df
 
 
-def standardize_Xtrain_Xtest(df_Xtrain, df_Xtest, quan_list):
-    # quan_list is the list of quantitative variables
-    # if y is in the df, drop it
-    # X_train = df[:1460].drop(['var1', 'var2'], axis=1)
-    # fit the training set only and then transform both training and test sets
-    scaler = RobustScaler()
-    df_Xtrain[quan_list] = scaler.fit_transform(df_Xtrain[quan_list])
-    df_Xtest[quan_list] = scaler.transform(df_Xtest[quan_list])
-    return df_Xtrain, df_Xtest
-
 
 
 
